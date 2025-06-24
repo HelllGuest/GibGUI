@@ -10,10 +10,10 @@ Features:
   - Byte-range resume support
 Usage: Called internally by gibmacos_gui.py
 Dependencies: requests, tqdm (optional)
-License: 
+License:
   - Original: MIT (corpnewt/gibMacOS)
   - Modifications: MIT
-Author: 
+Author:
   - Original: corpnewt
   - Modifications: Anoop Kumar
 Date:
@@ -24,6 +24,7 @@ Date:
 import os
 import requests
 import time
+
 
 class Downloader:
     def __init__(self, skip_w=False, skip_q=False, skip_s=False, interactive=True):
@@ -51,7 +52,9 @@ class Downloader:
         elif t < 3600:
             return "{: >2}m {: >2}s".format(int(t // 60), int(t % 60))
         else:
-            return "{: >2}h {: >2}m {: >2}s".format(int(t // 3600), int((t % 3600) // 60), int(t % 60))
+            return "{: >2}h {: >2}m {: >2}s".format(
+                int(t // 3600), int((t % 3600) // 60), int(t % 60)
+            )
 
     def get_size(self, size):
         if size < 1024:
@@ -83,34 +86,56 @@ class Downloader:
                 print(f"Error getting bytes from {url}: {e}")
             return None
 
-    def stream_to_file(self, url, file_path, resume_bytes=0, total_bytes=-1, allow_resume=True, callback=None, cancel_event=None):
+    def stream_to_file(
+        self,
+        url,
+        file_path,
+        resume_bytes=0,
+        total_bytes=-1,
+        allow_resume=True,
+        callback=None,
+        cancel_event=None,
+    ):
         try:
             self.bytes_downloaded = resume_bytes
             self.total = total_bytes
             self.start_time = time.time()
-            
+
             if cancel_event and cancel_event.is_set():
                 return None
 
-            self.resume_header = {"Range": "bytes={}-".format(resume_bytes)} if allow_resume and resume_bytes > 0 else {}
-            
+            self.resume_header = (
+                {"Range": "bytes={}-".format(resume_bytes)}
+                if allow_resume and resume_bytes > 0
+                else {}
+            )
+
             if self.total == -1 and allow_resume and resume_bytes > 0:
                 try:
                     if cancel_event and cancel_event.is_set():
                         return None
-                    self.total = int(requests.head(url, headers=self.headers).headers["Content-Length"])
+                    self.total = int(
+                        requests.head(url, headers=self.headers).headers[
+                            "Content-Length"
+                        ]
+                    )
                 except:
                     pass
 
             if cancel_event and cancel_event.is_set():
                 return None
 
-            req = requests.get(url, headers={**self.headers, **self.resume_header}, stream=True, timeout=30)
-            
+            req = requests.get(
+                url,
+                headers={**self.headers, **self.resume_header},
+                stream=True,
+                timeout=30,
+            )
+
             if self.total == -1:
-                try: 
+                try:
                     self.total = int(req.headers["Content-Length"])
-                except: 
+                except:
                     pass
 
             chunk_size = 1024 * 8  # Increased chunk size for better performance
@@ -125,13 +150,23 @@ class Downloader:
                         if callback:
                             callback(self.bytes_downloaded, self.total, self.start_time)
             return file_path
-        
+
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 416 and allow_resume and resume_bytes > 0:
-                print(f"Server returned 416. Retrying download from scratch for {os.path.basename(file_path)}.")
+                print(
+                    f"Server returned 416. Retrying download from scratch for {os.path.basename(file_path)}."
+                )
                 if os.path.exists(file_path):
                     os.remove(file_path)
-                return self.stream_to_file(url, file_path, resume_bytes=0, total_bytes=-1, allow_resume=False, callback=callback, cancel_event=cancel_event)
+                return self.stream_to_file(
+                    url,
+                    file_path,
+                    resume_bytes=0,
+                    total_bytes=-1,
+                    allow_resume=False,
+                    callback=callback,
+                    cancel_event=cancel_event,
+                )
             else:
                 print(f"Download failed due to HTTP error: {e}")
                 return None
