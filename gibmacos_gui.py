@@ -1,3 +1,23 @@
+#!/usr/bin/env python3
+"""
+Title: GibMacOS Graphical Interface
+Description: User-friendly GUI for macOS installer downloads
+Features:
+  - Catalog selection (Public Release/Beta/Developer)
+  - Version filtering
+  - Download progress tracking
+  - Console log viewer
+  - Sleep prevention (macOS)
+  - Download directory selection
+Usage: 
+  - Primary: Launched via run_gui.py
+  - Direct: python gibmacos_gui.py (after integration)
+Dependencies: tkinter, requests, pyobjc (macOS only)
+License: MIT
+Author: YourName
+Date: 24/06/2025 (DD/MM/YYYY)
+"""
+
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import os
@@ -1098,4 +1118,5 @@ https://github.com/corpnewt/gibMacOS
 
 if __name__ == "__main__":
     app = GibMacOSGUI()
+    print("GUI version running successfully!")
     app.mainloop()

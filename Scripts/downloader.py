@@ -1,7 +1,29 @@
 #!/usr/bin/env python3
+"""
+Title: Modified macOS Downloader
+Description: Enhanced version of corpnewt's downloader with GUI integration
+Features:
+  - GUI-compatible progress reporting
+  - Cancellation support
+  - Error handling improvements
+  - Speed calculation
+  - Byte-range resume support
+Usage: Called internally by gibmacos_gui.py
+Dependencies: requests, tqdm (optional)
+License: 
+  - Original: MIT (corpnewt/gibMacOS)
+  - Modifications: MIT
+Author: 
+  - Original: corpnewt
+  - Modifications: Anoop Kumar
+Date:
+  - Original: 26/09/2018 (DD/MM/YYYY)
+  - Modifications: 24/06/2025 (DD/MM/YYYY)
+"""
 
-import requests, os, sys, time
-import threading
+import os
+import requests
+import time
 
 class Downloader:
     def __init__(self, skip_w=False, skip_q=False, skip_s=False, interactive=True):
